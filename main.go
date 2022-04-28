@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/tarm/serial"
 )
@@ -14,12 +15,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	printImage(s, "Lenna.png")
+	f, _ := os.Open("_img/Lenna.png")
+	defer f.Close()
+	printImage(s, f)
 	s.Flush()
-
-	// p := escpos.New(s)
-	// // // printBasictDemo(p)
-	// p.Init()
-	// p.Cut()
-
 }

@@ -6,32 +6,21 @@ import (
 	_ "image/png"
 	"io"
 	"log"
-	"os"
 
 	"github.com/lestrrat-go/dither"
 	"github.com/nfnt/resize"
 	"github.com/pkg/errors"
 )
 
-const (
-	ESC = 0x1B
-)
-
-func printImage(wr io.Writer, fn string) error {
-	file, err := os.Open(fn)
-	if err != nil {
-		return errors.Wrap(err, "fail to print image")
-	}
-
+func printImage(wr io.Writer, file io.Reader) error {
 	// decode jpeg into image.Image
 	img, _, err := image.Decode(file)
 	if err != nil {
 		return errors.Wrap(err, "fail to print image")
 	}
-	file.Close()
 	origW, origH := img.Bounds().Dx(), img.Bounds().Dy()
 
-	w := 512
+	w := 576 // maxWidth
 	h := ((origH * w) / origW) / 3
 	log.Println(w, h)
 	m := resize.Resize(uint(w), uint(h), img, resize.Lanczos3)
@@ -76,7 +65,7 @@ func printImage(wr io.Writer, fn string) error {
 		wr.Write(printBuf)
 	}
 
-	//cut
+	// Paper cut
 	wr.Write([]byte("\x1B@\x1DVA0"))
 	return nil
 }
