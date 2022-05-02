@@ -12,7 +12,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-func printImage(wr io.Writer, file io.Reader) error {
+const (
+	maxWidth = 576
+)
+
+func printImage(file io.Reader) error {
+	wr := printerDev
+
 	// decode jpeg into image.Image
 	img, _, err := image.Decode(file)
 	if err != nil {
@@ -20,14 +26,14 @@ func printImage(wr io.Writer, file io.Reader) error {
 	}
 	origW, origH := img.Bounds().Dx(), img.Bounds().Dy()
 
-	w := 576 // maxWidth
-	h := ((origH * w) / origW) / 3
-	log.Println(w, h)
-	m := resize.Resize(uint(w), uint(h), img, resize.Lanczos3)
+	var w, h int
+	if origW < maxWidth {
+		w = 576 // maxWidth
+		h = ((origH * w) / origW) / 3
+		img = resize.Resize(uint(w), uint(h), img, resize.Lanczos3)
+	}
 
-	ditheredImg := dither.Monochrome(dither.Burkes, m, 1.18)
-	// rect := ditheredImg.Bounds()
-	// h := rect.Dy()
+	ditheredImg := dither.Monochrome(dither.Burkes, img, 1.18)
 	dataBuf := make([]byte, w*((h+7)/8))
 
 	// 가로방향 점의 개수: nL + nH x 256
@@ -52,7 +58,6 @@ func printImage(wr io.Writer, file io.Reader) error {
 			dataBufIdx += 1
 		}
 	}
-	// log.Println(dataBuf)
 
 	// 가운데 정렬
 	wr.Write([]byte{0x1B, 0x61, 1})
