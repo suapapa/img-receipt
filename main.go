@@ -29,7 +29,8 @@ func main() {
 	var err error
 
 	if flagUsbDev != "" {
-		printerDev, err = os.Open(flagUsbDev)
+		// /dev/usb/lp0
+		printerDev, err = os.OpenFile(flagUsbDev, os.O_RDWR, 0)
 		if err != nil {
 			log.Fatal(err)
 		}

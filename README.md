@@ -12,7 +12,7 @@ scp img-receipt pi@rpi-pos.local:~/
 ```
 
 ```bash
-curl -F "img=@./_img/Lenna.png" -k http://rpi-pos.local:8080/upload
+curl -F "img=@./_img/Lenna.png" http://rpi-pos.local:8080/upload
 ```
 
 ## Reference
