@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"github.com/tarm/serial"
 )
 
@@ -60,5 +61,14 @@ func uploadHandler(c *gin.Context) {
 	file, _, _ := c.Request.FormFile("img")
 	defer file.Close()
 
-	printImage(file)
+	dpi := c.Query("dpi")
+	if dpi == "200" {
+		if err := printImage24bitDouble(file); err != nil {
+			c.Error(errors.Wrap(err, "fail to print"))
+		}
+	} else {
+		if err := printImage8bitDouble(file); err != nil {
+			c.Error(errors.Wrap(err, "fail to print"))
+		}
+	}
 }
