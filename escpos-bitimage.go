@@ -6,7 +6,6 @@ import (
 	_ "image/png"
 	"io"
 	"log"
-	"os"
 
 	"github.com/lestrrat-go/dither"
 	"github.com/nfnt/resize"
@@ -14,31 +13,27 @@ import (
 )
 
 const (
-	ESC = 0x1B
+	maxWidth = 576
 )
 
-func printImage(wr io.Writer, fn string) error {
-	file, err := os.Open(fn)
-	if err != nil {
-		return errors.Wrap(err, "fail to print image")
-	}
+func printImage(file io.Reader) error {
+	wr := printerDev
 
 	// decode jpeg into image.Image
 	img, _, err := image.Decode(file)
 	if err != nil {
 		return errors.Wrap(err, "fail to print image")
 	}
-	file.Close()
 	origW, origH := img.Bounds().Dx(), img.Bounds().Dy()
 
-	w := 512
-	h := ((origH * w) / origW)
-	log.Println(w, h)
-	m := resize.Resize(uint(w), uint(h), img, resize.Lanczos3)
+	var w, h int
+	if origW < maxWidth {
+		w = 576 // maxWidth
+		h = ((origH * w) / origW) / 3
+		img = resize.Resize(uint(w), uint(h), img, resize.Lanczos3)
+	}
 
-	ditheredImg := dither.Monochrome(dither.Burkes, m, 1.18)
-	// rect := ditheredImg.Bounds()
-	// h := rect.Dy()
+	ditheredImg := dither.Monochrome(dither.Burkes, img, 1.18)
 	dataBuf := make([]byte, (3*w*h+7)/8)
 
 	// 가로방향 점의 개수: nL + nH x 256
@@ -69,7 +64,6 @@ func printImage(wr io.Writer, fn string) error {
 			}
 		}
 	}
-	// log.Println(dataBuf)
 
 	// 가운데 정렬
 	wr.Write([]byte{0x1B, 0x61, 1})
@@ -82,7 +76,7 @@ func printImage(wr io.Writer, fn string) error {
 		wr.Write(printBuf)
 	}
 
-	//cut
+	// Paper cut
 	wr.Write([]byte("\x1B@\x1DVA0"))
 	return nil
 }
