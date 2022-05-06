@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bufio"
 	"flag"
-	"io"
 	"log"
 	"os"
 	"time"
@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	printerDev    io.Writer
+	printerDev    *bufio.Writer
 	flagSerialDev string
 	flagUsbDev    string
 	flagEnBle     bool
@@ -27,26 +27,29 @@ func main() {
 	flag.IntVar(&flagAdvDu, "a", 0, "ble advertisement duration")
 	flag.Parse()
 
-	var err error
-
 	if flagUsbDev != "" {
 		// /dev/usb/lp0
-		printerDev, err = os.OpenFile(flagUsbDev, os.O_RDWR, 0)
+		dev, err := os.OpenFile(flagUsbDev, os.O_RDWR, 0)
+		printerDev = bufio.NewWriter(dev)
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer dev.Close()
 	} else {
 		c := &serial.Config{Name: flagSerialDev, Baud: 9600}
-		printerDev, err = serial.OpenPort(c)
+		dev, err := serial.OpenPort(c)
 		if err != nil {
 			log.Fatal(err)
 		}
+		printerDev = bufio.NewWriter(dev)
+		defer dev.Close()
 	}
 
 	r := gin.Default()
 	// r.SetTrustedProxies([]string{"192.168.1.2"})
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	r.POST("/upload", uploadHandler)
+	r.POST("/cut", cutHandler)
 
 	go r.Run(":8080")
 	if flagEnBle {
@@ -71,4 +74,12 @@ func uploadHandler(c *gin.Context) {
 			c.Error(errors.Wrap(err, "fail to print"))
 		}
 	}
+	cut := c.Query("cut")
+	if cut == "1" || cut == "true" {
+		cutPaper()
+	}
+}
+
+func cutHandler(c *gin.Context) {
+	cutPaper()
 }

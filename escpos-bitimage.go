@@ -116,7 +116,7 @@ func printBuf(cmdBuf, dataBuf []byte, widthDataLen int) error {
 	wr := printerDev
 
 	// Standard mode
-	wr.Write([]byte{0x1B, 0x53})
+	wr.Write([]byte{0x1B, 0x0C})
 
 	// 가운데 정렬
 	wr.Write([]byte{0x1B, 0x61, 1})
@@ -127,9 +127,13 @@ func printBuf(cmdBuf, dataBuf []byte, widthDataLen int) error {
 	for i := 0; i < len(dataBuf); i += widthDataLen {
 		printBuf := append(cmdBuf, dataBuf[i:i+widthDataLen]...)
 		wr.Write(printBuf)
+		wr.Flush()
 	}
-
-	// Paper cut
-	wr.Write([]byte("\x1B@\x1DVA0"))
 	return nil
+}
+
+func cutPaper() {
+	// Paper cut
+	printerDev.Write([]byte("\x1B@\x1DVA0"))
+	printerDev.Flush()
 }
