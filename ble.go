@@ -53,7 +53,7 @@ func imgReceiptDataWriteChar() *ble.Characteristic {
 		log.Printf("onDataWrite: receivced %v bytes\n", len(data))
 		byteBuff := bytes.NewBuffer(data)
 
-		err := printImage(byteBuff)
+		err := printImage8bitDouble(byteBuff)
 		chkErr(err)
 	}))
 	return c
