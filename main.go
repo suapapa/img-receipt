@@ -49,6 +49,7 @@ func main() {
 	// r.SetTrustedProxies([]string{"192.168.1.2"})
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
 	r.POST("/upload", uploadHandler)
+	r.POST("/qr", qrHandler)
 	r.POST("/cut", cutHandler)
 
 	go r.Run(":8080")
