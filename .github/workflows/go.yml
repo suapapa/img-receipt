@@ -28,7 +28,7 @@ jobs:
 
       - name: get build time
         id: get_time
-        run: echo ::set-output name=HASH::$(date '+%Y-%m-%d_%H:%M:%S_%Z')
+        run: echo ::set-output name=TIMESTAMP::$(date '+%Y-%m-%d_%H:%M:%S_%Z')
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
