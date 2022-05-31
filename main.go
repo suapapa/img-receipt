@@ -13,6 +13,9 @@ import (
 )
 
 var (
+	programName                   = "img-receipt"
+	buildStamp, gitHash, buildTag string
+
 	printerDev    *bufio.Writer
 	flagSerialDev string
 	flagUsbDev    string
@@ -21,6 +24,8 @@ var (
 )
 
 func main() {
+	log.Printf("%s-%s-%s(%s)", programName, buildTag, gitHash, buildStamp)
+
 	flag.StringVar(&flagSerialDev, "s", "/dev/ttyACM0", "serial device")
 	flag.StringVar(&flagUsbDev, "u", "", "if specify usb lp device -s will be ignored")
 	flag.BoolVar(&flagEnBle, "b", false, "enable ble server")
@@ -75,10 +80,11 @@ func uploadHandler(c *gin.Context) {
 			c.Error(errors.Wrap(err, "fail to print"))
 		}
 	}
-	cut := c.Query("cut")
-	if cut == "1" || cut == "true" {
-		cutPaper()
+	nocut := c.Query("nocut")
+	if nocut == "1" || nocut == "true" {
+		return
 	}
+	cutPaper()
 }
 
 func cutHandler(c *gin.Context) {

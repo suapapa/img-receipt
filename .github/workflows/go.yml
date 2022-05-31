@@ -28,7 +28,10 @@ jobs:
 
       - name: get build time
         id: get_time
-        run: echo ::set-output name=HASH::$(date '+%Y-%m-%d_%H:%M:%S_%Z')
+        run: echo ::set-output name=TIMESTAMP::$(date '+%Y-%m-%d_%H:%M:%S_%Z')
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         id: buildx
@@ -37,14 +40,13 @@ jobs:
       - name: docker login
         uses: docker/login-action@v1
         with:
-          registry: nebuchadnezzar.kr-central-1.kcr.dev
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
       - name: docker build and push
         uses: docker/build-push-action@v2
         with:
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: ${{ github.event_name == 'push' }}
           tags: |
             suapapa/img-receipt:latest
