@@ -6,9 +6,19 @@
 
 ## usage
 
+Manual build:
+
 ```bash
 GOARCH=arm GOOS=linux go build && \
 scp img-receipt pi@rpi-pos.local:~/
+```
+
+Using Docker:
+
+```bash
+docker run -d --restart unless-stopped --net host \
+   --device /dev/usb/lp \
+   suapapa/img-receipt:latest -u /dev/usb/lp
 ```
 
 ```bash
