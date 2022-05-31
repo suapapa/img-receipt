@@ -75,10 +75,11 @@ func uploadHandler(c *gin.Context) {
 			c.Error(errors.Wrap(err, "fail to print"))
 		}
 	}
-	cut := c.Query("cut")
-	if cut == "1" || cut == "true" {
-		cutPaper()
+	nocut := c.Query("nocut")
+	if nocut == "1" || nocut == "true" {
+		return
 	}
+	cutPaper()
 }
 
 func cutHandler(c *gin.Context) {
