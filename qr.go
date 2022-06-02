@@ -29,4 +29,9 @@ func qrHandler(c *gin.Context) {
 	if err := printImage8bitDouble(pngReader); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
+	nocut := c.Query("nocut")
+	if nocut == "1" || nocut == "true" {
+		return
+	}
+	cutPaper()
 }
