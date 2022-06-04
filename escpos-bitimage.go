@@ -25,8 +25,8 @@ func printImage8bitDouble(file io.Reader) error {
 	origW, origH := img.Bounds().Dx(), img.Bounds().Dy()
 
 	var w, h int
-	if origW < maxWidth {
-		w = 576 // maxWidth
+	if origW != maxWidth {
+		w = maxWidth
 		h = ((origH * w) / origW) / 3
 		img = resize.Resize(uint(w), uint(h), img, resize.Lanczos3)
 	}

@@ -67,7 +67,10 @@ func main() {
 }
 
 func uploadHandler(c *gin.Context) {
-	file, _, _ := c.Request.FormFile("img")
+	file, _, err := c.Request.FormFile("img")
+	if err != nil {
+		c.Error(errors.Wrap(err, "fail to print"))
+	}
 	defer file.Close()
 
 	dpi := c.Query("dpi")
