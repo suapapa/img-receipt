@@ -1,5 +1,7 @@
 # img-receipt
 
+!! DEPRECATED !! merged to [thermal-station](https://github.com/suapapa/thermal-station)
+
 이미지를 영수증프린터로 출력하는 프로그램
 
 ![example](_img/example.jpg)
