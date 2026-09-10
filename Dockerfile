@@ -1,10 +1,13 @@
 # build stage
-FROM golang:1.17 as builder
+# NOTE: bullseye is archived (upx package gone, old Go can't build go1.27 modules) -> trixie
+FROM golang:1.27-trixie as builder
 
 ENV CGO_ENABLED=0
 
+# NOTE: Debian trixie ships UPX 4.x only as `upx-ucl`; the binary is /usr/bin/upx-ucl (symlinked to upx)
 RUN apt-get -qq update && \
-    apt-get install -yqq upx
+    apt-get install -yqq upx-ucl && \
+    ln -s "$(command -v upx-ucl)" /usr/local/bin/upx
 
 COPY . /build
 WORKDIR /build
